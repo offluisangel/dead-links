@@ -1,0 +1,4 @@
+allowBuilds:
+  esbuild: false
+overrides:
+  dead-links: 'link:'
