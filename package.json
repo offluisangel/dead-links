@@ -39,12 +39,9 @@
   "engines": {
     "node": ">=20.0.0"
   },
-  "devEngines": {
-    "packageManager": {
-      "name": "pnpm",
-      "version": "^11.0.8",
-      "onFail": "download"
-    }
+  "packageManager": "pnpm@11.0.8",
+  "dependencies": {
+    "ora": "^9.4.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -60,14 +57,5 @@
     "tsup": "^8.5.1",
     "typescript": "^6.0.3",
     "vitest": "^4.1.6"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild"
-    ]
-  },
-  "dependencies": {
-    "dead-links": "link:",
-    "ora": "^9.4.0"
   }
 }

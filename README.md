@@ -2,25 +2,15 @@
 
 A CLI tool to scan your Obsidian vault for broken links, orphan notes, and connection graphs.
 
-## Installation
+## Usage
 
 ```bash
-npm install -g dead-links
+npx dead-links scan --vault "my-vault"
+npx dead-links broken --vault "my-vault" --verbose
+npx dead-links orphans --vault "my-vault" --ignore-folders Films Diary
+npx dead-links graph --vault "my-vault" --format json
+npx dead-links report --vault "my-vault" --output report.md
 ```
-
-Or use without installing:
-
-```bash
-npx dead-links scan --vault ./my-vault
-```
-
-## Quick Start
-
-```bash
-dead-links scan --vault ./my-vault
-```
-
-That's it. You'll see broken links, orphan notes, and graph stats.
 
 ## Commands
 
@@ -32,46 +22,100 @@ That's it. You'll see broken links, orphan notes, and graph stats.
 | `dead-links graph` | Show connection graph |
 | `dead-links report` | Generate a `.md` report file |
 
-## Options
-
-| Flag | Description |
-|------|-------------|
-| `--vault <path>` | Path to the vault (default: current directory) |
-| `--format <type>` | Output format: `text`, `json`, or `markdown` (default: `text`) |
-| `--output <file>` | Save output to a file |
-| `--ignore <patterns...>` | Glob patterns to ignore |
-| `--attachments` | Also check if images/PDFs/files exist |
-| `--ignore-folders <folders...>` | Exclude folders from orphan report |
-| `--quiet` | Only show issues, no stats or summary |
-| `--no-color` | Disable colored output |
-| `--verbose` | Show line numbers and full details |
-
-## Examples
+### scan
 
 ```bash
-# Scan vault
-dead-links scan --vault ./my-vault
+dead-links scan [options]
 
-# Check for broken links only
-dead-links broken --vault ./my-vault
+Options:
+  --vault <path>              Path to the Obsidian vault (default: current directory)
+  --format <type>            Output format: text, json, markdown (default: text)
+  --output <file>            Save output to a file
+  --ignore <patterns...>     Glob patterns to ignore
+  --attachments              Also check embedded attachments (images, PDFs)
+  --ignore-folders <folders> Exclude folders from orphan report
+  --quiet                    Only show issues, no stats
+  --no-color                 Disable colored output
+```
+
+### broken
+
+```bash
+dead-links broken [options]
+
+Options:
+  --vault <path>         Path to the Obsidian vault (default: current directory)
+  --ignore <patterns...> Glob patterns to ignore
+  --attachments          Also check embedded attachments
+  --verbose              Show line numbers and full details
+```
+
+### orphans
+
+```bash
+dead-links orphans [options]
+
+Options:
+  --vault <path>              Path to the Obsidian vault (default: current directory)
+  --ignore <patterns...>      Glob patterns to ignore
+  --ignore-folders <folders>  Exclude folders from report
+  --verbose                   Show full list of orphan notes
+```
+
+### graph
+
+```bash
+dead-links graph [options]
+
+Options:
+  --vault <path>         Path to the Obsidian vault (default: current directory)
+  --format <type>        Output format: text, json (default: text)
+  --ignore <patterns...> Glob patterns to ignore
+```
+
+### report
+
+```bash
+dead-links report [options]
+
+Options:
+  --vault <path>         Path to the Obsidian vault (default: current directory)
+  --output <file>        Output file path (default: dead-links-report.md)
+  --ignore <patterns...> Glob patterns to ignore
+```
+
+## Quick Start
+
+```bash
+# Full scan
+npx dead-links scan --vault "my-vault"
+
+# Check for broken links only with verbose output
+npx dead-links broken --vault "my-vault" --verbose
 
 # Include attachments in the check
-dead-links scan --vault ./my-vault --attachments
+npx dead-links scan --vault "my-vault" --attachments
 
 # Ignore noisy folders from orphan report
-dead-links scan --vault ./my-vault --ignore-folders Films Trunk Diary
+npx dead-links scan --vault "my-vault" --ignore-folders Films Diary Books
 
 # JSON output for scripts/CI
-dead-links scan --vault ./my-vault --format json
+npx dead-links scan --vault "my-vault" --format json
 
 # Generate markdown report
-dead-links report --vault ./my-vault --output report.md
+npx dead-links report --vault "my-vault" --output report.md
 
 # Ignore patterns
-dead-links scan --vault ./my-vault --ignore "**/Templates/**" "**/.trash/**"
+npx dead-links scan --vault "my-vault" --ignore "**/Templates/**" "**/.trash/**"
 
 # Quiet mode (only issues)
-dead-links scan --vault ./my-vault --quiet
+npx dead-links scan --vault "my-vault" --quiet
+
+# Disable colors
+npx dead-links scan --vault "my-vault" --no-color
+
+# Show orphan notes list
+npx dead-links orphans --vault "my-vault" --verbose
 ```
 
 ## Output Format
@@ -133,15 +177,5 @@ Exit code is `0` if no issues found, `1` if issues exist. Perfect for CI pipelin
 - `![[image.png]]` - Embeds
 - `[text](file.md)` - Markdown links
 
-## Development
-
-```bash
-pnpm install
-pnpm run build
-pnpm test
-pnpm run lint
-```
-
 ## License
-
 MIT
