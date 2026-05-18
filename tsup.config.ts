@@ -7,7 +7,7 @@ export default defineConfig({
   dts: true,
   clean: true,
   sourcemap: true,
-  external: ['chalk', 'commander', 'gray-matter', 'fast-glob', 'ora'],
+  external: ['chalk', 'commander', 'ora'],
   banner: {
     js: '#!/usr/bin/env node',
   },

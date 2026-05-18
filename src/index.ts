@@ -13,7 +13,7 @@ const program = new Command();
 program
   .name('dead-links')
   .description('Scan Obsidian vaults for broken links, orphan notes, and connection graphs')
-  .version('0.1.0');
+  .version('0.1.3');
 
 async function loadConfigAndAnalyze(
   vaultPath: string,
