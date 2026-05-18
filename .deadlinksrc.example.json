@@ -1,0 +1,16 @@
+{
+  "ignore": [
+    "**/Templates/**",
+    "**/.trash/**",
+    "**/Attachments/**",
+    "**/*.excalidraw.md"
+  ],
+  "ignoreFolders": [
+    "Films",
+    "Trunk",
+    "Diario",
+    "Books",
+    "Games"
+  ],
+  "checkAttachments": false
+}
