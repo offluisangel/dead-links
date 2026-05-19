@@ -45,6 +45,18 @@ export class ConfigLoader {
       ignoreFolders:
         (cliOptions.ignoreFolders as string[] | undefined) ||
         fileConfig.ignoreFolders,
+      suggestions:
+        (cliOptions.suggestions as boolean | undefined) ??
+        fileConfig.suggestions ??
+        false,
+      debug:
+        (cliOptions.debug as boolean | undefined) ??
+        fileConfig.debug ??
+        false,
+      fix:
+        (cliOptions.fix as boolean | undefined) ??
+        fileConfig.fix ??
+        false,
     };
   }
 }

@@ -1,10 +1,10 @@
 {
   "name": "dead-links",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "description": "CLI tool to scan Obsidian vaults for broken links, orphan notes, and connection graphs",
   "type": "module",
   "bin": {
-    "dead-links": "./dist/index.js"
+    "dead-links": "dist/index.js"
   },
   "files": [
     "dist"
@@ -30,7 +30,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/offluisangel/dead-links.git"
+    "url": "git+https://github.com/offluisangel/dead-links.git"
   },
   "homepage": "https://github.com/offluisangel/dead-links#readme",
   "bugs": {

@@ -40,10 +40,21 @@ export interface AnalysisReport {
     connectedComponents: number;
   };
   duration: number;
+  suggestions?: Array<{ broken: string; suggested: string; similarity: number }>;
+}
+
+export interface Suggestion {
+  broken: string;
+  suggested: string;
+  similarity: number;
+  source: string;
 }
 
 export interface DeadLinksConfig {
   ignore?: string[];
   checkAttachments?: boolean;
   ignoreFolders?: string[];
+  suggestions?: boolean;
+  debug?: boolean;
+  fix?: boolean;
 }

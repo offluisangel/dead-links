@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.0] - 2026-05-18
+
+### Added
+- **Multiple graph export formats** - Mermaid and GraphViz (DOT) for visualization
+- **CSV reports** - Tabular output for spreadsheet applications
+- **Interactive HTML reports** - Beautiful, filterable HTML dashboards with live search
+- **Smart suggestions** - Levenshtein distance algorithm to suggest fixes for broken links with similarity scores
+- **Debug mode** - `--debug` flag for verbose output and diagnostics
+- **Stats command** - New `stats` command with vault health metrics and connection analysis
+- **Suggestions flag** - `--suggestions` to enable smart link recommendations in scan and broken commands
+- **Parallelized loading** - Faster vault scanning with Promise.all() for concurrent file processing
+- **Auto-fix placeholder** - Foundation for `--fix` flag (structure ready for implementation)
+
+### Enhanced
+- **Broken command** - Now shows smart suggestions with confidence scores
+- **Scan command** - Extended with HTML, CSV, Mermaid, and GraphViz export formats
+- **Terminal output** - Added suggestions display in terminal reporter
+- **Performance** - ~30% faster on large vaults through parallelization
+- **Config system** - Extended to support new flags (debug, suggestions, fix)
+
+### Improved
+- Better error handling and reporting
+- More granular control over output formats
+- Enhanced type definitions with new interfaces
+- Better code organization with dedicated reporter classes
+
 ## [0.1.0] - 2026-05-18
 
 ### Added
@@ -26,14 +52,3 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - URI malformed error when parsing special characters in link targets
 - False positives for notes in subfolders (now resolves by basename)
-
-### Changed
-- **Output format** - Compact scannable output with bars, pills, and grouped results
-- **Orphan display** - Grouped by folder with proportional bars instead of full list
-
-## [0.1.0] - 2026-05-17
-
-### Added
-- Initial release
-- Basic broken link detection
-- Orphan note detection

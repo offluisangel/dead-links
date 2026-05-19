@@ -23,6 +23,9 @@ export class TerminalReporter {
     output += this.printStats(result);
     output += this.printBrokenLinks(result.brokenLinks);
     output += this.printOrphanNotes(result.orphanNotes);
+    if (result.suggestions && result.suggestions.length > 0) {
+      output += this.printSuggestions(result.suggestions);
+    }
     output += this.printDuration(result.duration);
     return output;
   }
@@ -140,5 +143,26 @@ export class TerminalReporter {
 
   private printDuration(ms: number): string {
     return chalk.dim(`  Completed in ${ms}ms\n`);
+  }
+
+  private printSuggestions(
+    suggestions: Array<{ broken: string; suggested: string; similarity: number }>,
+  ): string {
+    let out = chalk.bold.cyan(`\n💡 Suggestions (${suggestions.length})\n\n`);
+
+    for (const suggestion of suggestions.slice(0, 5)) {
+      const confidence = Math.round(suggestion.similarity * 100);
+      const bar =
+        confidence >= 80
+          ? chalk.green('█████')
+          : confidence >= 60
+            ? chalk.yellow('█████')
+            : chalk.gray('█████');
+
+      out += `  ${chalk.gray(suggestion.broken)} → ${chalk.cyan(suggestion.suggested)}\n`;
+      out += `      ${bar} ${confidence}%\n\n`;
+    }
+
+    return out;
   }
 }
