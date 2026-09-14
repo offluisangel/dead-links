@@ -1,7 +1,8 @@
-import type { Note, GraphNode, Link } from '../types/index.js';
+import type { Note, GraphNode } from '../types/index.js';
 import { AliasResolver } from './alias-resolver.js';
+import { isExternalTarget, resolveNoteLink } from './link-resolver.js';
 
-export function buildGraph(notes: Note[], resolver: AliasResolver): GraphNode[] {
+export function buildGraph(notes: Note[], resolver: AliasResolver, vaultPath: string): GraphNode[] {
   const notePathMap = new Map<string, GraphNode>();
 
   for (const note of notes) {
@@ -16,11 +17,9 @@ export function buildGraph(notes: Note[], resolver: AliasResolver): GraphNode[] 
     const node = notePathMap.get(note.path)!;
 
     for (const link of note.links) {
-      if (link.type === 'markdown' && !link.target.endsWith('.md')) {
-        continue;
-      }
+      if (isExternalTarget(link.target)) continue;
 
-      const resolvedPath = resolver.resolve(link.target);
+      const resolvedPath = resolveNoteLink(link, note, notes, resolver, vaultPath);
 
       if (resolvedPath && notePathMap.has(resolvedPath)) {
         if (!node.outgoing.includes(resolvedPath)) {

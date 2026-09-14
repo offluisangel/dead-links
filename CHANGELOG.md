@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.0] - 2026-09-14
+
+### Fixed
+- Correct contextual resolution for relative Markdown links.
+- Correct existence checks for attachments with `--attachments`.
+- Implemented the opt-in `scan --fix` flow using generated suggestions.
+- Avoided `NaN` in statistics for empty vaults and vaults without links.
+- Made `--no-color` disable terminal colors.
+- Centralized CLI version lookup from `package.json` and improved reporter typing.
+- Normalized Windows vault paths so orphan and source-folder reports group correctly.
+
+### Packaging
+- Prepared the dependency lockfile for reproducible installs.
+- Added release, validation, and npm/GitHub publication instructions.
+
 ## [0.2.0] - 2026-05-18
 
 ### Added

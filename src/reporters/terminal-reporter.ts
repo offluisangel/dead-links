@@ -1,4 +1,4 @@
-import chalk from 'chalk';
+import { Chalk } from 'chalk';
 import type {
   AnalysisReport,
   BrokenLink,
@@ -8,10 +8,12 @@ import type {
 export class TerminalReporter {
   private ignoreFolders: string[];
   private quiet: boolean;
+  private chalk: Chalk;
 
-  constructor(ignoreFolders: string[] = [], quiet = false) {
+  constructor(ignoreFolders: string[] = [], quiet = false, noColor = false) {
     this.ignoreFolders = ignoreFolders;
     this.quiet = quiet;
+    this.chalk = new Chalk({ level: noColor ? 0 : undefined });
   }
 
   report(result: AnalysisReport): string {
@@ -63,12 +65,13 @@ export class TerminalReporter {
   }
 
   private statLine(label: string, value: string, color: 'red' | 'yellow' | 'white' = 'white'): string {
-    return `  ${chalk.gray(label)}  ${color === 'red' ? chalk.red.bold(value) : color === 'yellow' ? chalk.yellow.bold(value) : chalk.white.bold(value)}\n`;
+    const chalk = this.chalk;
+    return `  ${this.chalk.gray(label)}  ${color === 'red' ? this.chalk.red.bold(value) : color === 'yellow' ? this.chalk.yellow.bold(value) : this.chalk.white.bold(value)}\n`;
   }
 
   private printBrokenLinks(brokenLinks: BrokenLink[]): string {
     if (brokenLinks.length === 0) {
-      return chalk.green('  ✓  No broken links\n\n');
+      return this.chalk.green('  ✓  No broken links\n\n');
     }
 
     const grouped = new Map<string, BrokenLink[]>();
@@ -80,19 +83,19 @@ export class TerminalReporter {
 
     const sorted = [...grouped.entries()].sort((a, b) => b[1].length - a[1].length);
 
-    let out = chalk.bold.red(`\n✖  Broken links (${brokenLinks.length})\n\n`);
+    let out = this.chalk.bold.red(`\n✖  Broken links (${brokenLinks.length})\n\n`);
 
     for (const [source, links] of sorted) {
       const count = links.length;
       const isMultiple = count >= 2;
 
-      const countStr = isMultiple ? chalk.red.bold(`✖  ${count}`) : chalk.yellow.bold(`✖  ${count}`);
-      out += `  ${countStr}  ${chalk.white.bold(source)}\n`;
+      const countStr = isMultiple ? this.chalk.red.bold(`✖  ${count}`) : this.chalk.yellow.bold(`✖  ${count}`);
+      out += `  ${countStr}  ${this.chalk.white.bold(source)}\n`;
 
       for (const link of links) {
         const pill = isMultiple
-          ? chalk.redBright(`[${link.link.target}]`)
-          : chalk.yellowBright(`[${link.link.target}]`);
+          ? this.chalk.redBright(`[${link.link.target}]`)
+          : this.chalk.yellowBright(`[${link.link.target}]`);
         out += `      ${pill}\n`;
       }
       out += '\n';
@@ -103,7 +106,7 @@ export class TerminalReporter {
 
   private printOrphanNotes(orphanNotes: Note[]): string {
     if (orphanNotes.length === 0) {
-      return chalk.green('  ✓  No orphan notes\n\n');
+      return this.chalk.green('  ✓  No orphan notes\n\n');
     }
 
     const byFolder = new Map<string, number>();
@@ -122,19 +125,19 @@ export class TerminalReporter {
     const sorted = [...byFolder.entries()].sort((a, b) => b[1] - a[1]);
 
     if (sorted.length === 0) {
-      return chalk.green('  ✓  No orphan notes (all in ignored folders)\n\n');
+      return this.chalk.green('  ✓  No orphan notes (all in ignored folders)\n\n');
     }
 
     const maxCount = sorted[0]![1];
     const barWidth = 10;
 
-    let out = chalk.bold.yellow(`\n⚠  Orphan notes (${orphanNotes.length} total)\n\n`);
+    let out = this.chalk.bold.yellow(`\n⚠  Orphan notes (${orphanNotes.length} total)\n\n`);
 
     for (const [folder, count] of sorted) {
       const filled = Math.round((count / maxCount) * barWidth);
       const empty = barWidth - filled;
-      const bar = chalk.gray('█'.repeat(filled) + '░'.repeat(empty));
-      out += `  ${chalk.gray(folder.padEnd(40))}  ${bar}  ${chalk.white.bold(String(count))}\n`;
+      const bar = this.chalk.gray('█'.repeat(filled) + '░'.repeat(empty));
+      out += `  ${this.chalk.gray(folder.padEnd(40))}  ${bar}  ${this.chalk.white.bold(String(count))}\n`;
     }
 
     out += '\n';
@@ -142,24 +145,24 @@ export class TerminalReporter {
   }
 
   private printDuration(ms: number): string {
-    return chalk.dim(`  Completed in ${ms}ms\n`);
+    return this.chalk.dim(`  Completed in ${ms}ms\n`);
   }
 
   private printSuggestions(
     suggestions: Array<{ broken: string; suggested: string; similarity: number }>,
   ): string {
-    let out = chalk.bold.cyan(`\n💡 Suggestions (${suggestions.length})\n\n`);
+    let out = this.chalk.bold.cyan(`\n💡 Suggestions (${suggestions.length})\n\n`);
 
     for (const suggestion of suggestions.slice(0, 5)) {
       const confidence = Math.round(suggestion.similarity * 100);
       const bar =
         confidence >= 80
-          ? chalk.green('█████')
+          ? this.chalk.green('█████')
           : confidence >= 60
-            ? chalk.yellow('█████')
-            : chalk.gray('█████');
+            ? this.chalk.yellow('█████')
+            : this.chalk.gray('█████');
 
-      out += `  ${chalk.gray(suggestion.broken)} → ${chalk.cyan(suggestion.suggested)}\n`;
+      out += `  ${this.chalk.gray(suggestion.broken)} → ${this.chalk.cyan(suggestion.suggested)}\n`;
       out += `      ${bar} ${confidence}%\n\n`;
     }
 

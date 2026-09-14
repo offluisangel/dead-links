@@ -3,6 +3,7 @@ import { resolve } from 'node:path';
 import type { Note, GraphNode, BrokenLink, AnalysisReport } from '../types/index.js';
 import { AliasResolver } from './alias-resolver.js';
 import { buildGraph } from './graph-builder.js';
+import { isExternalTarget, resolveAttachmentPath, resolveNoteLink } from './link-resolver.js';
 
 const ATTACHMENT_EXTENSIONS = new Set([
   'png', 'jpg', 'jpeg', 'gif', 'svg', 'webp', 'bmp', 'ico',
@@ -24,28 +25,40 @@ export function analyze(
   notes: Note[],
   vaultPath: string,
   checkAttachments = false,
+  ignoreFolders: string[] = [],
 ): AnalysisReport {
   const resolver = new AliasResolver(notes);
-  const graph = buildGraph(notes, resolver);
+  const graph = buildGraph(notes, resolver, vaultPath);
 
   const brokenLinks: BrokenLink[] = [];
   const orphanNotes: Note[] = [];
 
   for (const node of graph) {
     if (node.incoming.length === 0 && node.outgoing.length === 0) {
-      orphanNotes.push(node.note);
+      if (!isIgnoredFolder(node.note.relativePath, ignoreFolders)) {
+        orphanNotes.push(node.note);
+      }
     }
 
     for (const link of node.note.links) {
-      if (link.type === 'markdown' && !link.target.endsWith('.md')) {
+      if (isExternalTarget(link.target)) {
         continue;
       }
 
-      if (!checkAttachments && isAttachment(link.target)) {
+      if (isAttachment(link.target)) {
+        if (!checkAttachments) continue;
+        const attachmentPath = resolveAttachmentPath(link.target, node.note, vaultPath);
+        if (!existsSync(attachmentPath)) {
+          brokenLinks.push({
+            source: node.note.relativePath,
+            link,
+            reason: `File "${link.target}" does not exist`,
+          });
+        }
         continue;
       }
 
-      const resolvedPath = resolver.resolve(link.target);
+      const resolvedPath = resolveNoteLink(link, node.note, notes, resolver, vaultPath);
 
       if (resolvedPath === node.note.path) {
         continue;
@@ -57,14 +70,6 @@ export function analyze(
           link,
           reason: `Target "${link.target}" not found in vault`,
         });
-      } else if (link.type === 'embed' || link.type === 'markdown') {
-        if (!existsSync(resolvedPath)) {
-          brokenLinks.push({
-            source: node.note.relativePath,
-            link,
-            reason: `File "${link.target}" does not exist`,
-          });
-        }
       }
     }
   }
@@ -84,6 +89,16 @@ export function analyze(
       connectedComponents,
     },
   };
+}
+
+function isIgnoredFolder(relativePath: string, ignoreFolders: string[]): boolean {
+  const folder = relativePath.includes('/')
+    ? relativePath.split('/').slice(0, -1).join('/')
+    : '';
+  return ignoreFolders.some((ignored) => {
+    const normalized = ignored.replace(/\\/g, '/').replace(/^\/+|\/+$/g, '');
+    return folder === normalized || folder.startsWith(`${normalized}/`);
+  });
 }
 
 function countConnectedComponents(graph: GraphNode[]): number {

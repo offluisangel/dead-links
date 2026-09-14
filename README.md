@@ -39,7 +39,7 @@ Options:
   --no-color                 Disable colored output
   --suggestions              Show smart suggestions for broken links
   --debug                    Enable debug mode with verbose output
-  --fix                      Auto-fix broken links (structure ready)
+  --fix                      Auto-fix broken links using generated suggestions
 ```
 
 ### broken
@@ -293,16 +293,6 @@ Exit code is `0` if no issues found, `1` if issues exist. Perfect for CI pipelin
 - `[[Note#^blockid]]` - Wiki links with block reference
 - `![[image.png]]` - Embeds
 - `[text](file.md)` - Markdown links
-
-## Version & Status
-
-**Current Version:** v0.2.0
-
-### What's New in v0.2.0
-- Multiple export formats (HTML, CSV, Mermaid, GraphViz)
-- Smart suggestions with similarity scoring
-- New `stats` command with vault metrics
-- Debug mode for diagnostics
 
 ## License
 MIT

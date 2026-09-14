@@ -21,10 +21,10 @@ export class DeadLinksEngine {
       }),
     );
 
-    const report = analyze(notes, vaultPath, config.checkAttachments);
+    const report = analyze(notes, vaultPath, config.checkAttachments, config.ignoreFolders);
 
     // Generate suggestions for broken links
-    if (config.suggestions) {
+    if (config.suggestions || config.fix) {
       const brokenTargets = Array.from(
         new Set(report.brokenLinks.map((b) => b.link.target)),
       );

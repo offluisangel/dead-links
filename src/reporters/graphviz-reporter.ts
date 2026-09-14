@@ -13,7 +13,7 @@ export class GraphVizReporter {
     // Add nodes with styling
     for (const node of nodesToShow) {
       const id = this.sanitizeId(node.note.relativePath);
-      const label = node.note.relativePath;
+      const label = this.escapeLabel(node.note.relativePath);
       let style = 'filled';
       let color = '#ffffff';
       let fontColor = '#000000';
@@ -70,5 +70,9 @@ export class GraphVizReporter {
 
   private sanitizeId(name: string): string {
     return name.replace(/\.(md|canvas)$/, '').replace(/[^a-zA-Z0-9_]/g, '_');
+  }
+
+  private escapeLabel(label: string): string {
+    return label.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
   }
 }

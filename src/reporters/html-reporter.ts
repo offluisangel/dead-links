@@ -1,4 +1,4 @@
-import type { AnalysisReport } from '../types/index.js';
+import type { AnalysisReport, BrokenLink, GraphNode, Note } from '../types/index.js';
 
 export class HtmlReporter {
   report(result: AnalysisReport): string {
@@ -245,7 +245,7 @@ export class HtmlReporter {
     `;
   }
 
-  private renderBrokenLinks(brokenLinks: any[]): string {
+  private renderBrokenLinks(brokenLinks: BrokenLink[]): string {
     if (brokenLinks.length === 0) {
       return `
         <div class="section">
@@ -293,7 +293,7 @@ export class HtmlReporter {
     `;
   }
 
-  private renderOrphanNotes(orphanNotes: any[]): string {
+  private renderOrphanNotes(orphanNotes: Note[]): string {
     if (orphanNotes.length === 0) {
       return `
         <div class="section">
@@ -333,7 +333,7 @@ export class HtmlReporter {
     `;
   }
 
-  private renderGraph(graph: any[]): string {
+  private renderGraph(graph: GraphNode[]): string {
     const mostConnected = [...graph]
       .sort((a, b) => (b.incoming.length + b.outgoing.length) - (a.incoming.length + a.outgoing.length))
       .slice(0, 5);

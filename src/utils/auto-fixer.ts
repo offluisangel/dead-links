@@ -1,5 +1,6 @@
 import { readFile, writeFile } from 'node:fs/promises';
-import type { BrokenLink, Link } from '../types/index.js';
+import { resolve } from 'node:path';
+import type { BrokenLink } from '../types/index.js';
 
 export interface FixResult {
   file: string;
@@ -11,11 +12,6 @@ export interface FixResult {
 
 function escapeRegExp(string: string): string {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
-function buildLinkRegex(link: Link): RegExp {
-  const escaped = escapeRegExp(link.raw);
-  return new RegExp(escaped, 'g');
 }
 
 export async function autoFixBrokenLinks(
@@ -105,6 +101,7 @@ export async function autoFixBrokenLinks(
 export async function fixBrokenLinksBatch(
   brokenLinks: BrokenLink[],
   suggestionMap: Map<string, string>,
+  vaultPath: string,
 ): Promise<Map<string, FixResult[]>> {
   const fileFixMap = new Map<string, Map<string, string>>();
 
@@ -123,10 +120,10 @@ export async function fixBrokenLinksBatch(
 
   // Process files in parallel
   const promises = Array.from(fileFixMap.entries()).map(
-    async ([_source, fixMap]) => {
-      // Note: we need the full path, not relativePath
-      // This will need adjustment when called
-      return fixMap;
+    async ([source, fixMap]) => {
+      const filePath = resolve(vaultPath, source);
+      const results = await autoFixBrokenLinks(fixMap, filePath);
+      allResults.set(source, results);
     },
   );
 

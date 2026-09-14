@@ -1,4 +1,5 @@
 import { Command } from 'commander';
+import { readFileSync } from 'node:fs';
 import { writeFile } from 'node:fs/promises';
 import ora from 'ora';
 import { DeadLinksEngine } from './utils/engine.js';
@@ -10,6 +11,12 @@ import { HtmlReporter } from './reporters/html-reporter.js';
 import { MermaidReporter } from './reporters/mermaid-reporter.js';
 import { GraphVizReporter } from './reporters/graphviz-reporter.js';
 import { generateMarkdownReport } from './utils/markdown-report.js';
+import { fixBrokenLinksBatch } from './utils/auto-fixer.js';
+import { Chalk } from 'chalk';
+
+const packageMetadata = JSON.parse(
+  readFileSync(new URL('../package.json', import.meta.url), 'utf8'),
+) as { version: string };
 import type { BrokenLink, Note } from './types/index.js';
 
 const program = new Command();
@@ -17,7 +24,7 @@ const program = new Command();
 program
   .name('dead-links')
   .description('Scan Obsidian vaults for broken links, orphan notes, and connection graphs')
-  .version('0.2.0');
+  .version(packageMetadata.version);
 
 async function loadConfigAndAnalyze(
   vaultPath: string,
@@ -73,6 +80,18 @@ program
       const report = await loadConfigAndAnalyze(options.vault, options);
       spinner.succeed(`Scanned ${report.stats.totalNotes} notes in ${report.duration}ms`);
 
+      let fixSummary = '';
+      if (options.fix) {
+        const suggestionMap = new Map(
+          (report.suggestions || []).map((suggestion) => [suggestion.broken, suggestion.suggested]),
+        );
+        const fixResults = await fixBrokenLinksBatch(report.brokenLinks, suggestionMap, options.vault);
+        const changed = [...fixResults.values()].flat().filter((result) => result.success).length;
+        const failed = [...fixResults.values()].flat().filter((result) => !result.success).length;
+        const fixSummary = `Auto-fix: ${changed} link(s) changed${failed > 0 ? `, ${failed} failed` : ''}.`;
+        console.error(fixSummary);
+      }
+
       if (options.debug) {
         console.log(`[DEBUG] Vault: ${options.vault}`);
         console.log(`[DEBUG] Format: ${options.format}`);
@@ -100,7 +119,11 @@ program
         const reporter = new GraphVizReporter();
         output = reporter.report(report);
       } else {
-        const reporter = new TerminalReporter(options.ignoreFolders || [], options.quiet || false);
+        const reporter = new TerminalReporter(
+          options.ignoreFolders || [],
+          options.quiet || false,
+          options.color === false,
+        );
         output = reporter.report(report);
       }
 
@@ -302,11 +325,15 @@ program
       console.log('\n📊 Vault Statistics\n');
       console.log(`  Total Notes: ${report.stats.totalNotes}`);
       console.log(`  Total Links: ${report.stats.totalLinks}`);
-      console.log(`  Avg Links per Note: ${(report.stats.totalLinks / report.stats.totalNotes).toFixed(2)}`);
+      const averageLinks = report.stats.totalNotes === 0 ? 0 : report.stats.totalLinks / report.stats.totalNotes;
+      const healthScore = report.stats.totalLinks === 0
+        ? 100
+        : 100 - (report.stats.brokenCount / report.stats.totalLinks) * 100;
+      console.log(`  Avg Links per Note: ${averageLinks.toFixed(2)}`);
       console.log(`  Broken Links: ${report.stats.brokenCount}`);
       console.log(`  Orphan Notes: ${report.stats.orphanCount}`);
       console.log(`  Connected Components: ${report.stats.connectedComponents}`);
-      console.log(`  Health Score: ${(100 - (report.stats.brokenCount / report.stats.totalLinks) * 100).toFixed(1)}%`);
+      console.log(`  Health Score: ${healthScore.toFixed(1)}%`);
 
       const mostConnected = [...report.graph]
         .sort((a, b) => (b.incoming.length + b.outgoing.length) - (a.incoming.length + a.outgoing.length))

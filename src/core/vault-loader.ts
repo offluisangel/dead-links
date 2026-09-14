@@ -25,6 +25,7 @@ export async function loadVault(
 
   for (const file of files) {
     const fullPath = resolve(absolutePath, file);
+    const relativePath = file.replace(/\\/g, '/');
     const content = await readFile(fullPath, 'utf-8');
     const parsed = matter(content);
 
@@ -39,7 +40,7 @@ export async function loadVault(
 
     notes.push({
       path: fullPath,
-      relativePath: file,
+      relativePath,
       content: parsed.content,
       aliases,
       links: [],
