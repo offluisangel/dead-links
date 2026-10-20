@@ -1,298 +1,110 @@
 # dead-links
 
-A CLI tool to scan your Obsidian vault for broken links, orphan notes, and connection graphs.
+Scan an Obsidian vault for broken links, orphan notes, and note connections. Run commands from the vault directory for the shortest workflow, or pass `--vault` when working elsewhere.
 
-## Usage
+## Quick start
+
+From the vault directory:
 
 ```bash
-npx dead-links scan --vault "my-vault"
-npx dead-links broken --vault "my-vault" --verbose
-npx dead-links orphans --vault "my-vault" --ignore-folders Films Diary
-npx dead-links graph --vault "my-vault" --format json
-npx dead-links report --vault "my-vault" --output report.md
+npx dead-links scan
+npx dead-links report --output dead-links-report.md
 ```
+
+From another directory:
+
+```bash
+npx dead-links scan --vault "D:/Notes/MyVault"
+npx dead-links report --vault "D:/Notes/MyVault" --output report.md
+```
+
+`scan` prints results in the terminal by default. `report` saves a Markdown report. Both use the current directory as the vault unless `--vault` is provided.
 
 ## Commands
 
-| Command | Description |
-|---------|-------------|
-| `dead-links scan` | Full scan: broken links + orphan notes + graph |
-| `dead-links broken` | Show only broken links with smart suggestions |
-| `dead-links orphans` | Show only orphan notes |
-| `dead-links graph` | Show connection graph |
-| `dead-links report` | Generate a `.md` report file |
-| `dead-links stats` | **NEW** Show detailed vault statistics |
+### `scan`
 
-### scan
+Analyze the vault and print or export the results.
 
 ```bash
 dead-links scan [options]
-
-Options:
-  --vault <path>              Path to the Obsidian vault (default: current directory)
-  --format <type>            Output format: text, json, markdown, csv, html, mermaid, dot (default: text)
-  --output <file>            Save output to a file
-  --ignore <patterns...>     Glob patterns to ignore
-  --attachments              Also check embedded attachments (images, PDFs)
-  --ignore-folders <folders> Exclude folders from orphan report
-  --quiet                    Only show issues, no stats
-  --no-color                 Disable colored output
-  --suggestions              Show smart suggestions for broken links
-  --debug                    Enable debug mode with verbose output
-  --fix                      Auto-fix broken links using generated suggestions
 ```
 
-### broken
+| Option | Description |
+|--------|-------------|
+| `--vault <path>` | Vault directory (default: current directory) |
+| `--format <type>` | Output format: `text`, `json`, `markdown`, `csv`, or `html` (default: `text`) |
+| `--output <file>` | Write results to a file instead of the terminal |
+| `--ignore <patterns...>` | Glob patterns to skip |
+| `--attachments` | Check embedded attachments such as images and PDFs |
+| `--ignore-folders <folders...>` | Exclude folders from orphan-note results |
+| `--quiet` | In text format, print only findings |
+| `--no-color` | Disable colors in text output |
+| `--debug` | Print additional scan details |
+
+Examples:
 
 ```bash
-dead-links broken [options]
+# Interactive HTML report
+npx dead-links scan --format html --output report.html
 
-Options:
-  --vault <path>         Path to the Obsidian vault (default: current directory)
-  --ignore <patterns...> Glob patterns to ignore
-  --attachments          Also check embedded attachments
-  --verbose              Show line numbers and full details
-  --suggestions          Show smart suggestions for broken links
-  --debug                Enable debug mode
+# JSON output
+npx dead-links scan --format json --output report.json
+
+# Skip template and trash folders
+npx dead-links scan --ignore "**/Templates/**" "**/.trash/**"
 ```
 
-### orphans
+### `report`
 
-```bash
-dead-links orphans [options]
-
-Options:
-  --vault <path>              Path to the Obsidian vault (default: current directory)
-  --ignore <patterns...>      Glob patterns to ignore
-  --ignore-folders <folders>  Exclude folders from report
-  --verbose                   Show full list of orphan notes
-```
-
-### graph
-
-```bash
-dead-links graph [options]
-
-Options:
-  --vault <path>         Path to the Obsidian vault (default: current directory)
-  --format <type>        Output format: text, json (default: text)
-  --ignore <patterns...> Glob patterns to ignore
-```
-
-### report
+Generate a Markdown report containing statistics, broken links, orphan notes, and connection summaries.
 
 ```bash
 dead-links report [options]
-
-Options:
-  --vault <path>         Path to the Obsidian vault (default: current directory)
-  --output <file>        Output file path (default: dead-links-report.md)
-  --ignore <patterns...> Glob patterns to ignore
 ```
 
-### stats
+| Option | Description |
+|--------|-------------|
+| `--vault <path>` | Vault directory (default: current directory) |
+| `--output <file>` | Report path (default: `dead-links-report.md`) |
+| `--ignore <patterns...>` | Glob patterns to skip |
 
-```bash
-dead-links stats [options]
+## Output formats
 
-Options:
-  --vault <path>         Path to the Obsidian vault (default: current directory)
-  --ignore <patterns...> Glob patterns to ignore
-  --debug                Enable debug mode
+- **Text** — scan statistics, broken links, and orphan notes in the terminal.
+- **JSON** — machine-readable scan results, including note connections.
+- **Markdown** — readable report with statistics, issues, orphan notes, and the most-connected notes.
+- **CSV** — tabular issue data for spreadsheets.
+- **HTML** — a responsive report with overview metrics, searchable issue tables, and note connections.
 
-Shows:
-  • Total notes and links count
-  • Average links per note
-  • Vault health score
-  • Most connected notes
-  • Orphan notes preview
-  • Connected components
-```
+Files are written relative to the current directory unless an output path is specified. Open `report.html` in a browser to view an HTML report.
 
-## Quick Start
-
-```bash
-# Full scan with suggestions
-npx dead-links scan --vault "my-vault" --suggestions
-
-# Check for broken links with suggestions
-npx dead-links broken --vault "my-vault" --suggestions
-
-# Detailed vault statistics
-npx dead-links stats --vault "my-vault"
-
-# Interactive HTML report
-npx dead-links scan --vault "my-vault" --format html --output report.html
-
-# CSV export for spreadsheets
-npx dead-links scan --vault "my-vault" --format csv --output issues.csv
-
-# Graph visualization (Mermaid diagram)
-npx dead-links scan --vault "my-vault" --format mermaid --output graph.md
-
-# Graph visualization (GraphViz/DOT format)
-npx dead-links scan --vault "my-vault" --format dot --output graph.dot
-
-# Markdown report
-npx dead-links report --vault "my-vault" --output report.md
-
-# Debug mode (verbose)
-npx dead-links scan --vault "my-vault" --debug
-
-# Include attachments in the check
-npx dead-links scan --vault "my-vault" --attachments
-
-# Ignore noisy folders from orphan report
-npx dead-links scan --vault "my-vault" --ignore-folders Films Diary Books
-
-# JSON output for scripts/CI
-npx dead-links scan --vault "my-vault" --format json
-
-# Ignore patterns
-npx dead-links scan --vault "my-vault" --ignore "**/Templates/**" "**/.trash/**"
-
-# Quiet mode (only issues)
-npx dead-links scan --vault "my-vault" --quiet
-
-# Disable colors
-npx dead-links scan --vault "my-vault" --no-color
-
-# Show orphan notes list
-npx dead-links orphans --vault "my-vault" --verbose
-```
-## Opening Reports
-
-After generating a report with `--output`, you can open it with:
-
-```bash
-# Windows
-start report.html
-
-# macOS
-open report.html
-
-# Linux
-xdg-open report.html
-
-# Or navigate to the file in your file explorer and double-click it
-```
-
-The generated files are saved in your current directory:
-- `report.html` - Open in any web browser
-- `issues.csv` - Open with Excel, Google Sheets, or any spreadsheet app
-- `graph.md` - View in GitHub, Obsidian, or any markdown viewer
-- `graph.dot` - Render with Graphviz: `dot -Tpng graph.dot -o graph.png`
-## Output Format
-
-```
-  Notes           368
-  Links           943
-  Broken links    5
-  Orphan notes    222
-  Components      248
-
-✖  Broken links (5)
-
-  ✖  2  Universidad/S1/Primer Semestre.md
-      [Missing Note 1]
-      [Missing Note 2]
-
-  ✖  1  Notes/My Note.md
-      [Another Missing]
-
-⚠  Orphan notes (222 total)
-
-  Notes/                                    ██████████  29
-  Dev/Projects/                             ███░░░░░░░  8
-
-  Completed in 234ms
-```
+![](assets/ss.png)
 
 ## Configuration
 
-Create a `.deadlinksrc.json` in your vault root for persistent settings:
+For persistent scan settings, create `.deadlinksrc.json` in the vault root:
 
 ```json
 {
   "ignore": ["**/Templates/**", "**/.trash/**"],
-  "ignoreFolders": ["Films", "Trunk", "Diary", "Books", "Games"],
+  "ignoreFolders": ["Films", "Diary", "Books"],
   "checkAttachments": false,
-  "suggestions": true,
-  "debug": false,
-  "fix": false
+  "debug": false
 }
 ```
 
-## Output Formats
+Command-line options override the corresponding configuration values.
 
-### Text (default)
-Colorful terminal output with stats, broken links, and orphan notes grouped by folder.
+## Links detected
 
-### JSON
-Machine-readable format for automation and scripting.
-
-### Markdown
-Human-readable report with sections for broken links and orphan notes.
-
-### CSV
-Tabular format compatible with Excel, Google Sheets, and data analysis tools.
-
-### HTML
-Beautiful interactive dashboard with:
-- Live search and filtering
-- Stats cards with metrics
-- Sortable tables
-- Most connected notes preview
-- Responsive design
-
-### Mermaid
-Graph visualization in Mermaid syntax. Render in:
-- GitHub README files
-- Obsidian notes
-- Notion docs
-- Online editors (mermaid.live)
-
-### GraphViz (DOT)
-Professional graph format for advanced visualization tools:
-- Graphviz CLI: `dot -Tpng graph.dot -o graph.png`
-- Online: webgraphviz.com
-
-## Smart Suggestions
-
-The `--suggestions` flag uses Levenshtein distance algorithm to recommend fixes for broken links:
-
-```bash
-npx dead-links broken --vault "my-vault" --suggestions
-```
-
-Example output:
-```
-💡 Suggestions:
-  MyNote → MyNotes (95%)
-  ProjectXY → ProjectXYZ (87%)
-  Article2 → Article1 (72%)
-```
-
-## CI/CD
-
-Exit code is `0` if no issues found, `1` if issues exist. Perfect for CI pipelines.
-
-```bash
-# GitHub Actions
-- run: npx dead-links scan --vault . --format json > report.json
-
-# Fail pipeline if broken links exist
-- run: npx dead-links scan --vault . --quiet && exit 1 || true
-```
-
-## Links Detected
-
-- `[[Note]]` - Wiki links
-- `[[Note|Alias]]` - Wiki links with alias
-- `[[Note#Section]]` - Wiki links with heading
-- `[[Note#^blockid]]` - Wiki links with block reference
-- `![[image.png]]` - Embeds
-- `[text](file.md)` - Markdown links
+- `[[Note]]` — Obsidian wiki links
+- `[[Note|Alias]]` — wiki links with aliases
+- `[[Note#Section]]` — links to headings
+- `[[Note#^blockid]]` — links to blocks
+- `![[image.png]]` — embedded attachments
+- `[text](file.md)` — Markdown links
 
 ## License
-MIT
+
+[MIT](LICENSE)
