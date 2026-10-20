@@ -1,7 +1,6 @@
 import { loadVault } from '../core/vault-loader.js';
 import { parseLinks } from '../core/link-parser.js';
 import { analyze } from '../core/analyzer.js';
-import { generateSuggestions } from './suggestions.js';
 import type { AnalysisReport, DeadLinksConfig } from '../types/index.js';
 
 export class DeadLinksEngine {
@@ -22,14 +21,6 @@ export class DeadLinksEngine {
     );
 
     const report = analyze(notes, vaultPath, config.checkAttachments, config.ignoreFolders);
-
-    // Generate suggestions for broken links
-    if (config.suggestions || config.fix) {
-      const brokenTargets = Array.from(
-        new Set(report.brokenLinks.map((b) => b.link.target)),
-      );
-      report.suggestions = generateSuggestions(brokenTargets, notes, 0.65);
-    }
 
     report.duration = Date.now() - startTime;
 

@@ -25,6 +25,12 @@ export function generateMarkdownReport(report: AnalysisReport): string {
   lines.push(`|--------|-------|`);
   lines.push(`| Notes | ${report.stats.totalNotes} |`);
   lines.push(`| Links | ${report.stats.totalLinks} |`);
+  const averageLinks = report.stats.totalNotes === 0 ? 0 : report.stats.totalLinks / report.stats.totalNotes;
+  const healthScore = report.stats.totalLinks === 0
+    ? 100
+    : 100 - (report.stats.brokenCount / report.stats.totalLinks) * 100;
+  lines.push(`| Avg links per note | ${averageLinks.toFixed(2)} |`);
+  lines.push(`| Health score | ${healthScore.toFixed(1)}% |`);
   lines.push(`| Broken | ${report.stats.brokenCount} |`);
   lines.push(`| Orphans | ${report.stats.orphanCount} |`);
   lines.push(`| Components | ${report.stats.connectedComponents} |`);
@@ -79,6 +85,25 @@ export function generateMarkdownReport(report: AnalysisReport): string {
   }
 
   lines.push('');
+  lines.push('## Connections');
+  lines.push('');
+  lines.push('| Note | Incoming | Outgoing | Total |');
+  lines.push('|------|----------|----------|-------|');
 
+  const mostConnected = [...report.graph]
+    .sort((a, b) => (b.incoming.length + b.outgoing.length) - (a.incoming.length + a.outgoing.length))
+    .slice(0, 10);
+
+  if (mostConnected.length === 0) {
+    lines.push('| No connected notes | 0 | 0 | 0 |');
+  } else {
+    for (const node of mostConnected) {
+      const incoming = node.incoming.length;
+      const outgoing = node.outgoing.length;
+      lines.push(`| ${node.note.relativePath} | ${incoming} | ${outgoing} | ${incoming + outgoing} |`);
+    }
+  }
+
+  lines.push('');
   return lines.join('\n');
 }

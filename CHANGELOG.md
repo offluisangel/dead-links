@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.0] - 2026-10-19
+
+### Changed
+- Consolidated the CLI around `scan` and `report`; removed the standalone `broken`, `orphans`, `graph`, and `stats` commands.
+- Removed Mermaid and GraphViz output formats, smart suggestions, and automatic link fixing.
+- Added connection summaries and vault health metrics to generated reports.
+- Refreshed the HTML report with a responsive layout, Obsidian-inspired violet accents, and bounded issue tables.
+- Simplified README usage around the current vault directory and the supported commands and formats.
+
 ## [0.3.0] - 2026-09-14
 
 ### Fixed

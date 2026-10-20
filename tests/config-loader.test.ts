@@ -9,18 +9,20 @@ describe('ConfigLoader', () => {
     const vaultPath = await mkdtemp(join(tmpdir(), 'dead-links-config-'));
     await writeFile(
       join(vaultPath, '.deadlinksrc.json'),
-      JSON.stringify({ ignore: ['**/Templates/**'], suggestions: false }),
+      JSON.stringify({ ignore: ['**/Templates/**'], suggestions: false, fix: false }),
     );
 
     const loader = new ConfigLoader();
     const fileConfig = await loader.loadConfig(vaultPath);
     const config = loader.mergeConfig(fileConfig, {
       suggestions: true,
+      fix: true,
       attachments: true,
     });
 
     expect(config.ignore).toEqual(['**/Templates/**']);
-    expect(config.suggestions).toBe(true);
+    expect(config).not.toHaveProperty('suggestions');
+    expect(config).not.toHaveProperty('fix');
     expect(config.checkAttachments).toBe(true);
   });
 });

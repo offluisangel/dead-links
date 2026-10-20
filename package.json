@@ -1,6 +1,6 @@
 {
   "name": "dead-links",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "CLI tool to scan Obsidian vaults for broken links, orphan notes, and connection graphs",
   "type": "module",
   "bin": {
