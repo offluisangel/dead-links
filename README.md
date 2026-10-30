@@ -2,6 +2,8 @@
 
 Scan an Obsidian vault for broken links, orphan notes, and note connections. Run commands from the vault directory for the shortest workflow, or pass `--vault` when working elsewhere.
 
+![](assets/ss1.png)
+
 ## Quick start
 
 From the vault directory:
@@ -71,15 +73,15 @@ dead-links report [options]
 
 ## Output formats
 
-- **Text** — scan statistics, broken links, and orphan notes in the terminal.
+- **Text** — color-coded terminal report with a vault health bar, broken links grouped by note (line, target, type), orphan notes by folder, and a one-line summary.
 - **JSON** — machine-readable scan results, including note connections.
 - **Markdown** — readable report with statistics, issues, orphan notes, and the most-connected notes.
 - **CSV** — tabular issue data for spreadsheets.
-- **HTML** — a responsive report with overview metrics, searchable issue tables, and note connections.
+- **HTML** — a responsive report with severity-colored metrics, a health bar, searchable issue tables, note connections, and automatic dark mode.
 
 Files are written relative to the current directory unless an output path is specified. Open `report.html` in a browser to view an HTML report.
 
-![](assets/ss.png)
+![](assets/ss2.png)
 
 ## Configuration
 

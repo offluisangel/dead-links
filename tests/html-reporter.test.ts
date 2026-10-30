@@ -84,4 +84,42 @@ describe('HtmlReporter', () => {
     expect(html).not.toContain('id="broken-filter"');
     expect(html).not.toContain('id="orphan-filter"');
   });
+
+  it('colors findings by severity and shows a vault health bar', () => {
+    const html = new HtmlReporter().report(report);
+
+    expect(html).toContain('prefers-color-scheme: dark');
+    expect(html).toContain('class="metric tone-danger"');
+    expect(html).toContain('class="metric tone-warn"');
+    expect(html).toContain('class="health-fill" style="width: 50.0%"');
+    expect(html).toContain('class="summary is-issues"');
+    expect(html).toContain('class="type-label type-wiki"');
+    expect(html).toContain('class="section-count count-danger"');
+  });
+
+  it('splits note paths into a muted folder and a highlighted file name', () => {
+    const nested: AnalysisReport = {
+      ...report,
+      orphanNotes: [
+        { path: '/vault/Films/Alien.md', relativePath: 'Films/Alien.md', content: '', aliases: [], links: [] },
+      ],
+    };
+
+    const html = new HtmlReporter().report(nested);
+
+    expect(html).toContain('<span class="path-dir">Films/</span><span class="path-name">Alien.md</span>');
+  });
+
+  it('uses the success style when the vault is clean', () => {
+    const html = new HtmlReporter().report({
+      ...report,
+      brokenLinks: [],
+      orphanNotes: [],
+      stats: { ...report.stats, brokenCount: 0, orphanCount: 0 },
+    });
+
+    expect(html).toContain('class="summary is-ok"');
+    expect(html).toContain('class="metric tone-ok"');
+    expect(html).toContain('class="section-count count-ok"');
+  });
 });

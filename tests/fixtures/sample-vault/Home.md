@@ -1,7 +1,7 @@
 ---
 aliases:
   - Home
-  - Inicio
+  - Start
 ---
 
 # Welcome

@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.0] - 2026-10-29
+
+### Changed
+- Redesigned the terminal report: header, section rules, a vault health bar, broken links grouped by note with line number, target, and link type, and a closing summary line (or "All clear").
+- The orphan note count in the terminal report now excludes notes in `--ignore-folders`.
+- Redesigned the HTML report: severity colors for metrics, counters, and summary, a vault health bar, link type badges, folder/file path styling, and automatic dark mode.
+- Translated the remaining non-English content (sample configuration and test fixtures) to English.
+
 ## [0.4.0] - 2026-10-19
 
 ### Changed

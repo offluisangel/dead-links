@@ -30,6 +30,15 @@ export class HtmlReporter {
             --accent-border: #DCD3FF;
             --border: #D9D6CD;
             --border-soft: #EBE9E3;
+            --ok: #1F7A4D;
+            --ok-wash: #EAF6EF;
+            --ok-border: #BFE3CF;
+            --danger: #B3261E;
+            --danger-wash: #FDEEEC;
+            --danger-border: #F3C6C1;
+            --warn: #8A5A00;
+            --warn-wash: #FFF5E0;
+            --warn-border: #F0D9A3;
             --space-1: 4px;
             --space-2: 8px;
             --space-3: 12px;
@@ -41,6 +50,34 @@ export class HtmlReporter {
             --font-ui: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             --font-display: 'Instrument Serif', Georgia, serif;
             --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                color-scheme: dark;
+                --canvas: #15141A;
+                --surface: #1E1D25;
+                --surface-raised: #26242F;
+                --ink: #F5F4F8;
+                --body: #D6D3DE;
+                --muted: #9A97A6;
+                --accent: #9B84FF;
+                --accent-ink: #C4B6FF;
+                --accent-wash: #2A2542;
+                --accent-border: #453D73;
+                --border: #34323F;
+                --border-soft: #2B2935;
+                --ok: #5FD39B;
+                --ok-wash: #16281F;
+                --ok-border: #24523A;
+                --danger: #FF8A80;
+                --danger-wash: #2D1A19;
+                --danger-border: #6B2D29;
+                --warn: #F2C063;
+                --warn-wash: #2B2314;
+                --warn-border: #6B5522;
+            }
+            .masthead { background-image: radial-gradient(rgba(155, 132, 255, .14) 1px, transparent 1.5px), radial-gradient(rgba(155, 132, 255, .06) 1px, transparent 1.5px); }
         }
 
         *, *::before, *::after { box-sizing: border-box; }
@@ -98,7 +135,15 @@ export class HtmlReporter {
             background: var(--accent-wash);
             color: var(--ink);
             font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
+        .summary::before { content: '◆'; color: var(--accent); }
+        .summary.is-ok { border-color: var(--ok-border); background: var(--ok-wash); }
+        .summary.is-ok::before { content: '✓'; color: var(--ok); font-weight: 700; }
+        .summary.is-issues { border-color: var(--warn-border); background: var(--warn-wash); }
+        .summary.is-issues::before { content: '!'; color: var(--warn); font-weight: 700; }
         .metrics {
             display: grid;
             grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -109,7 +154,14 @@ export class HtmlReporter {
         .metric { min-height: 110px; padding: 18px 20px; background: var(--surface); }
         .metric-value { display: block; color: var(--ink); font-size: 28px; font-weight: 600; line-height: 1.15; font-variant-numeric: tabular-nums; letter-spacing: -.03em; }
         .metric-label { display: block; margin-top: 8px; color: var(--muted); font-size: 12px; }
-        .metric:nth-child(3) .metric-value, .metric:nth-child(4) .metric-value { color: var(--accent-ink); }
+        .tone-danger .metric-value { color: var(--danger); }
+        .tone-warn .metric-value { color: var(--warn); }
+        .tone-ok .metric-value { color: var(--ok); }
+        .metric-health { grid-column: span 2; }
+        .health-track { display: block; height: 8px; margin-top: 14px; background: var(--border-soft); overflow: hidden; }
+        .health-fill { display: block; height: 100%; background: var(--ok); }
+        .tone-warn .health-fill { background: #D9A021; }
+        .tone-danger .health-fill { background: var(--danger); }
         .section { margin-top: var(--space-section); }
         .section-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
         .section-count { color: var(--accent-ink); background: var(--accent-wash); padding: 3px 8px; font-family: var(--font-mono); font-size: 11px; font-variant-numeric: tabular-nums; }
@@ -154,8 +206,24 @@ export class HtmlReporter {
         td { padding: 13px 16px; border-bottom: 1px solid var(--border-soft); color: var(--body); vertical-align: top; }
         tbody tr:last-child td { border-bottom: 0; }
         tbody tr:hover { background: var(--surface-raised); }
-        td:first-child { color: var(--ink); font-weight: 500; }
-        .type-label { color: var(--muted); font-family: var(--font-mono); font-size: 11px; }
+        td:first-child { color: var(--ink); font-weight: 500; word-break: break-word; }
+        .type-label {
+            display: inline-block;
+            padding: 2px 8px;
+            border: 1px solid var(--border);
+            color: var(--muted);
+            font-family: var(--font-mono);
+            font-size: 11px;
+        }
+        .type-wiki { color: var(--accent-ink); background: var(--accent-wash); border-color: var(--accent-border); }
+        .type-embed { color: var(--warn); background: var(--warn-wash); border-color: var(--warn-border); }
+        .target { color: var(--danger); font-family: var(--font-mono); font-size: 13px; word-break: break-word; }
+        .path-dir { color: var(--muted); font-weight: 400; }
+        .path-name { color: var(--ink); font-weight: 500; }
+        .section-count.count-danger { color: var(--danger); background: var(--danger-wash); }
+        .section-count.count-warn { color: var(--warn); background: var(--warn-wash); }
+        .section-count.count-ok { color: var(--ok); background: var(--ok-wash); }
+        .empty-state.is-ok::before { content: '✓ '; color: var(--ok); font-weight: 700; }
         .numeric { font-variant-numeric: tabular-nums; white-space: nowrap; }
         .empty-state { margin: 0; padding: 22px 16px; color: var(--muted); }
         .empty-state strong { color: var(--ink); font-weight: 500; }
@@ -243,7 +311,7 @@ export class HtmlReporter {
                 <h2 id="overview-title">At a glance</h2>
                 <p>Scan completed in ${result.duration}ms</p>
             </div>
-            <p class="summary">${this.escapeHtml(message)}</p>
+            <p class="summary ${brokenCount === 0 && orphanCount === 0 ? 'is-ok' : 'is-issues'}" role="status">${this.escapeHtml(message)}</p>
         </section>
     `;
   }
@@ -254,23 +322,25 @@ export class HtmlReporter {
     const healthScore = stats.totalLinks === 0
       ? 100
       : 100 - (stats.brokenCount / stats.totalLinks) * 100;
-    const metrics = [
-      ['Total Notes', String(stats.totalNotes)],
-      ['Links', String(stats.totalLinks)],
-      ['Broken links', String(stats.brokenCount)],
-      ['Orphan notes', String(stats.orphanCount)],
-      ['Avg. links per note', averageLinks.toFixed(2)],
-      ['Vault health', `${healthScore.toFixed(1)}%`],
-      ['Connected components', String(stats.connectedComponents)],
+    const healthTone = healthScore >= 95 ? 'ok' : healthScore >= 80 ? 'warn' : 'danger';
+    const metrics: Array<{ label: string; value: string; tone?: string; health?: boolean }> = [
+      { label: 'Total Notes', value: String(stats.totalNotes) },
+      { label: 'Links', value: String(stats.totalLinks) },
+      { label: 'Broken links', value: String(stats.brokenCount), tone: stats.brokenCount > 0 ? 'danger' : 'ok' },
+      { label: 'Orphan notes', value: String(stats.orphanCount), tone: stats.orphanCount > 0 ? 'warn' : 'ok' },
+      { label: 'Avg. links per note', value: averageLinks.toFixed(2) },
+      { label: 'Connected components', value: String(stats.connectedComponents) },
+      { label: 'Vault health', value: `${healthScore.toFixed(1)}%`, tone: healthTone, health: true },
     ];
 
     return `
         <section class="overview" aria-label="Vault statistics">
             <div class="metrics">
-                ${metrics.map(([label, value]) => `
-                <div class="metric">
-                    <span class="metric-value">${this.escapeHtml(value)}</span>
-                    <span class="metric-label">${this.escapeHtml(label)}</span>
+                ${metrics.map((metric) => `
+                <div class="metric${metric.tone ? ` tone-${metric.tone}` : ''}${metric.health ? ' metric-health' : ''}">
+                    <span class="metric-value">${this.escapeHtml(metric.value)}</span>
+                    <span class="metric-label">${this.escapeHtml(metric.label)}</span>
+                    ${metric.health ? `<span class="health-track" role="img" aria-label="Vault health ${healthScore.toFixed(1)}%"><span class="health-fill" style="width: ${healthScore.toFixed(1)}%"></span></span>` : ''}
                 </div>`).join('')}
             </div>
         </section>
@@ -281,8 +351,8 @@ export class HtmlReporter {
     const rows = brokenLinks.map((link) => `
         <tr>
             <td>${this.escapeHtml(link.source)}</td>
-            <td>${this.escapeHtml(link.link.target)}</td>
-            <td><span class="type-label">${this.escapeHtml(link.link.type)}</span></td>
+            <td><span class="target">${this.escapeHtml(link.link.target)}</span></td>
+            <td><span class="type-label type-${this.escapeHtml(link.link.type)}">${this.escapeHtml(link.link.type)}</span></td>
             <td class="numeric">${link.link.line}</td>
             <td>${this.escapeHtml(link.reason)}</td>
         </tr>
@@ -292,11 +362,11 @@ export class HtmlReporter {
         <section class="section" aria-labelledby="broken-title">
             <div class="section-heading">
                 <h2 id="broken-title">Broken links</h2>
-                <span class="section-count">${brokenLinks.length} found</span>
+                <span class="section-count ${brokenLinks.length === 0 ? 'count-ok' : 'count-danger'}">${brokenLinks.length} found</span>
             </div>
             <div class="data-surface">
                 ${brokenLinks.length === 0
-                  ? '<p class="empty-state">No broken links found.</p>'
+                  ? '<p class="empty-state is-ok">No broken links found.</p>'
                   : `<div class="filter-row">
                         <label for="broken-filter">Filter broken links</label>
                         <input type="search" id="broken-filter" aria-label="Filter broken links" placeholder="Search source, target, type, or reason">
@@ -314,18 +384,18 @@ export class HtmlReporter {
 
   private renderOrphanNotes(orphanNotes: Note[]): string {
     const rows = orphanNotes.map((note) => `
-        <tr><td>${this.escapeHtml(note.relativePath)}</td></tr>
+        <tr><td>${this.renderPath(note.relativePath)}</td></tr>
     `).join('');
 
     return `
         <section class="section" aria-labelledby="orphans-title">
             <div class="section-heading">
                 <h2 id="orphans-title">Orphan notes</h2>
-                <span class="section-count">${orphanNotes.length} found</span>
+                <span class="section-count ${orphanNotes.length === 0 ? 'count-ok' : 'count-warn'}">${orphanNotes.length} found</span>
             </div>
             <div class="data-surface">
                 ${orphanNotes.length === 0
-                  ? '<p class="empty-state">No orphan notes found!</p>'
+                  ? '<p class="empty-state is-ok">No orphan notes found!</p>'
                   : `<div class="filter-row">
                         <label for="orphan-filter">Filter orphan notes</label>
                         <input type="search" id="orphan-filter" aria-label="Filter orphan notes" placeholder="Search note paths">
@@ -347,7 +417,7 @@ export class HtmlReporter {
       .slice(0, 5);
     const rows = mostConnected.map((node) => `
         <tr>
-            <td>${this.escapeHtml(node.note.relativePath)}</td>
+            <td>${this.renderPath(node.note.relativePath)}</td>
             <td class="numeric">${node.incoming.length}</td>
             <td class="numeric">${node.outgoing.length}</td>
             <td class="numeric">${node.incoming.length + node.outgoing.length}</td>
@@ -370,6 +440,16 @@ export class HtmlReporter {
             </div>
         </section>
     `;
+  }
+
+  private renderPath(relativePath: string): string {
+    const index = relativePath.lastIndexOf('/');
+    if (index === -1) {
+      return `<span class="path-name">${this.escapeHtml(relativePath)}</span>`;
+    }
+    const dir = relativePath.slice(0, index + 1);
+    const name = relativePath.slice(index + 1);
+    return `<span class="path-dir">${this.escapeHtml(dir)}</span><span class="path-name">${this.escapeHtml(name)}</span>`;
   }
 
   private escapeHtml(text: string): string {
